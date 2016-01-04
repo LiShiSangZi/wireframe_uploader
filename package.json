@@ -1,0 +1,21 @@
+{
+  "name": "axure_wireframe",
+  "version": "0.0.1",
+  "description": "Axure Wirframe Server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "axure",
+    "wireframe"
+  ],
+  "author": "gogocrow",
+  "license": "ISC",
+  "dependencies": {
+    "busboy": "^0.2.12",
+    "express": "^4.13.3",
+    "fstream": "^1.0.8",
+    "unzip": "^0.1.11"
+  }
+}
