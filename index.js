@@ -3,6 +3,7 @@
 var express = require('express');
 var app = express();
 var Busboy = require('busboy');
+var path = require('path');
 
 var fstream = require('fstream');
 var fs = require('fs');
@@ -14,24 +15,31 @@ app.use('/wf', express.static(__dirname + '/export'));
 
 app.set('port', process.env.PORT || 4000);
 
+
+var exec = require('child_process').exec;
+
 app.post('/upload', function(req, res, next) {
     var busboy = new Busboy({
         headers: req.headers
     });
     busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-        var writeStream = fstream.Writer('./' + filename);
+        if (mimetype != 'application/zip') {
+            res.status(401).send('Need a ZIP file.');
+            return;
+        }
+        var writeStream = fstream.Writer('./zip/' + filename);
         file.pipe(writeStream);
+        var p = path.resolve('.');
 
-        var exec = require('child_process').exec;
-
-        exec('rm ' + filename);
-    });
-    busboy.on('finish', function() {
-        res.writeHead(303, {
-            Connection: 'close',
-            Location: '/wf'
+        file.on('end', function() {
+            exec('rm -rf ./export && mkdir export && unzip ./zip/' + filename + ' -d ./export/', function() {
+                res.writeHead(303, {
+                    Connection: 'close',
+                    Location: '/wf/' + filename.replace(/\.(.*)$/, '') + '/index.html'
+                });
+                res.end();
+            });
         });
-        res.end();
     });
     return req.pipe(busboy);
 });
